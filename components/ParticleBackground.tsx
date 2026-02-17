@@ -101,7 +101,7 @@ export function ParticleBackground() {
     <Particles
       id="tsparticles"
       className="absolute inset-0 pointer-events-none"
-      options={options}
+      options={options as any}
     />
   )
 }

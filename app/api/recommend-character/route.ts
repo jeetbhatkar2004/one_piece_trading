@@ -3,8 +3,6 @@ import { getServerSession } from 'next-auth'
 import { Resend } from 'resend'
 import { authOptions } from '@/lib/auth'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(req: NextRequest) {
   try {
     const recipientEmail = process.env.RECOMMENDATIONS_EMAIL
@@ -16,13 +14,16 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    if (!process.env.RESEND_API_KEY) {
+    const resendApiKey = process.env.RESEND_API_KEY
+    if (!resendApiKey) {
       console.error('RESEND_API_KEY not configured')
       return NextResponse.json(
         { error: 'Recommendations are temporarily unavailable' },
         { status: 500 }
       )
     }
+
+    const resend = new Resend(resendApiKey)
 
     const body = await req.json()
     const { characters } = body as { characters: string }

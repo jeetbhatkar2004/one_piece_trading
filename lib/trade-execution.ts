@@ -1,12 +1,11 @@
 import { prisma } from './prisma'
 import { quoteBuy, quoteSell, applySlippage, getSpotPrice } from './amm'
 import Decimal from 'decimal.js'
-import { TradeSide } from '@prisma/client'
 
 interface ExecuteTradeParams {
   userId: string
   characterId: string
-  side: TradeSide
+  side: 'BUY' | 'SELL'
   amountIn: Decimal
   slippageBps: number
   clientNonce: string

@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
         let netWorth = new Decimal(user.wallet.berriesBalance)
 
         for (const position of user.positions) {
-          if (position.tokensBalance > 0 && position.character.pool) {
+          if (new Decimal(position.tokensBalance).gt(0) && position.character.pool) {
             const currentPrice = getSpotPrice(
               new Decimal(position.character.pool.reserveBerries),
               new Decimal(position.character.pool.reserveTokens)
