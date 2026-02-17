@@ -39,7 +39,7 @@ export function FriendsTradesFeed() {
   if (!session) {
     return (
       <div className="bg-white border-2 border-black/20 rounded-lg p-8 text-center shadow-sm">
-        <p className="text-black/60 mb-4 font-mono">Please login to view friends' trades</p>
+        <p className="text-black/60 mb-4 font-mono">Please login to view friends&apos; trades</p>
       </div>
     )
   }
@@ -47,7 +47,7 @@ export function FriendsTradesFeed() {
   if (isLoading) {
     return (
       <div className="text-center py-8 text-black/60">
-        <div className="animate-pulse font-mono">Loading friends' trades...</div>
+        <div className="animate-pulse font-mono">Loading friends&apos; trades...</div>
       </div>
     )
   }
@@ -63,7 +63,7 @@ export function FriendsTradesFeed() {
 
   return (
     <div className="bg-white border-2 border-black/20 rounded-lg p-6 shadow-sm">
-      <h2 className="font-display text-3xl text-black mb-6">FRIENDS' TRADES</h2>
+      <h2 className="font-display text-3xl text-black mb-6">FRIENDS&apos; TRADES</h2>
       <div className="space-y-3">
         {data.trades.map((trade, index) => (
           <motion.div

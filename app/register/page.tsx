@@ -144,7 +144,7 @@ export default function RegisterPage() {
                       placeholder="your@email.com"
                     />
                     <p className="mt-1 text-xs text-black/40 font-mono">
-                      We'll send you a verification code
+                      We&apos;ll send you a verification code
                     </p>
                   </div>
                   <motion.button

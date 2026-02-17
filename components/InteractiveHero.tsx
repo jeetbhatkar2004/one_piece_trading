@@ -134,7 +134,7 @@ export function InteractiveHero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
           >
-            Trade the Grand Line's greatest warriors. Build your crew. Conquer the markets.
+            Trade the Grand Line&apos;s greatest warriors. Build your crew. Conquer the markets.
           </motion.p>
         </motion.div>
 

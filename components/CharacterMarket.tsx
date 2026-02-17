@@ -66,7 +66,7 @@ export function CharacterMarket({ slug }: { slug: string }) {
     return (
       <div className="text-center py-8 text-black">
         <div className="font-display text-4xl mb-4">Character not found</div>
-        <p className="text-black/60 font-mono">The character you're looking for doesn't exist.</p>
+        <p className="text-black/60 font-mono">The character you&apos;re looking for doesn&apos;t exist.</p>
       </div>
     )
   }
