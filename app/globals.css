@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --accent-red: #dc2626;
+  --accent-orange: #ea580c;
+  --accent-yellow: #fbbf24;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-display {
+  font-family: var(--font-bebas), sans-serif;
+  letter-spacing: 0.05em;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dc2626;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ea580c;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes mangaFlip {
+  0% {
+    transform: perspective(1000px) rotateY(0deg);
+  }
+  50% {
+    transform: perspective(1000px) rotateY(5deg);
+  }
+  100% {
+    transform: perspective(1000px) rotateY(0deg);
+  }
+}
+
+@keyframes speedLines {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-shimmer {
+  animation: shimmer 3s infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-mangaFlip {
+  animation: mangaFlip 4s ease-in-out infinite;
+}
+
+.animate-speedLines {
+  animation: speedLines 2s linear infinite;
+}
+
+/* One Piece themed elements */
+.jolly-roger {
+  filter: drop-shadow(0 0 10px rgba(220, 38, 38, 0.5));
+}
+
+.accent-line {
+  background: linear-gradient(90deg, transparent, #dc2626, transparent);
+  height: 2px;
+}
+
+/* Manga page effects */
+.manga-page {
+  background: 
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+  background-size: 40px 40px;
+}
+
+.manga-panel {
+  position: relative;
+  border: 3px solid rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.manga-panel::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* One Piece themed hover effects */
+.one-piece-hover {
+  transition: all 0.3s ease;
+}
+
+.one-piece-hover:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(220, 38, 38, 0.2);
+}

@@ -1,0 +1,215 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  username      String    @unique
+  email         String    @unique
+  emailVerified Boolean   @default(false) @map("email_verified")
+  passwordHash  String    @map("password_hash")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  wallet        Wallet?
+  positions     Position[]
+  trades        Trade[]
+  snapshots     LeaderboardSnapshot[]
+  sentFriendRequests     Friendship[] @relation("FriendRequestSender")
+  receivedFriendRequests Friendship[] @relation("FriendRequestReceiver")
+  posts         Post[]
+  likes         PostLike[]
+  
+  @@map("users")
+}
+
+model Otp {
+  id        String    @id @default(uuid())
+  email     String
+  code      String
+  expiresAt DateTime  @map("expires_at")
+  used      Boolean   @default(false)
+  createdAt DateTime  @default(now()) @map("created_at")
+  
+  @@index([email, code])
+  @@index([expiresAt])
+  @@map("otps")
+}
+
+model Friendship {
+  id        String    @id @default(uuid())
+  senderId  String    @map("sender_id")
+  receiverId String    @map("receiver_id")
+  status    String    @default("PENDING")
+  sender    User      @relation("FriendRequestSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver  User      @relation("FriendRequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  
+  @@unique([senderId, receiverId])
+  @@index([senderId, status])
+  @@index([receiverId, status])
+  @@map("friendships")
+}
+
+model Post {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  likesCount Int      @default(0) @map("likes_count")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  
+  likes     PostLike[]
+  
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+model PostLike {
+  id        String    @id @default(uuid())
+  postId    String    @map("post_id")
+  userId    String    @map("user_id")
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @map("created_at")
+  
+  @@unique([postId, userId])
+  @@index([postId])
+  @@map("post_likes")
+}
+
+model Wallet {
+  userId        String    @id @map("user_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  berriesBalance Decimal  @default(1000) @map("berries_balance")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  @@map("wallets")
+}
+
+model Character {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  displayName   String    @map("display_name")
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  pool          Pool?
+  positions     Position[]
+  trades        Trade[]
+  candles       PriceCandle[]
+  
+  @@map("characters")
+}
+
+model Pool {
+  characterId   String    @id @map("character_id")
+  character     Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  reserveBerries Decimal  @map("reserve_berries")
+  reserveTokens  Decimal  @map("reserve_tokens")
+  feeBps        Int       @default(100) @map("fee_bps")
+  version       Int       @default(0)
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  @@map("pools")
+}
+
+model Position {
+  userId        String    @map("user_id")
+  characterId   String    @map("character_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  character     Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  tokensBalance Decimal   @default(0) @map("tokens_balance")
+  avgCostBerries Decimal  @default(0) @map("avg_cost_berries")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  @@id([userId, characterId])
+  @@map("positions")
+}
+
+model Trade {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  characterId   String    @map("character_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  character     Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  side          String
+  berriesIn     Decimal   @map("berries_in")
+  berriesOut    Decimal   @map("berries_out")
+  tokensIn      Decimal   @map("tokens_in")
+  tokensOut     Decimal   @map("tokens_out")
+  feePaid       Decimal   @map("fee_paid")
+  priceBefore   Decimal   @map("price_before")
+  priceAfter    Decimal   @map("price_after")
+  clientNonce   String    @map("client_nonce")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  @@unique([userId, clientNonce])
+  @@index([characterId, createdAt])
+  @@index([userId, createdAt])
+  @@map("trades")
+}
+
+model PriceCandle {
+  characterId   String    @map("character_id")
+  character     Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  bucketStart   DateTime  @map("bucket_start")
+  open          Decimal
+  high          Decimal
+  low           Decimal
+  close         Decimal
+  volumeBerries Decimal   @map("volume_berries")
+  volumeTokens  Decimal   @map("volume_tokens")
+  
+  @@id([characterId, bucketStart])
+  @@index([characterId, bucketStart])
+  @@map("price_candles")
+}
+
+model LeaderboardSnapshot {
+  seasonId      String    @map("season_id")
+  userId        String    @map("user_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  season        Season    @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  netWorth      Decimal   @map("net_worth")
+  rank          Int
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  @@id([seasonId, userId])
+  @@index([seasonId, rank])
+  @@map("leaderboard_snapshots")
+}
+
+model Season {
+  id            String    @id @default(uuid())
+  name          String
+  startsAt      DateTime  @map("starts_at")
+  endsAt        DateTime? @map("ends_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  snapshots     LeaderboardSnapshot[]
+  
+  @@map("seasons")
+}
+
+model MarketConfig {
+  id            String    @id @default("market")
+  isOpen        Boolean   @default(true) @map("is_open")
+  lastEvent     String?   @map("last_event")
+  closedAt      DateTime? @map("closed_at")
+  reopenedAt    DateTime? @map("reopened_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  @@map("market_config")
+}
