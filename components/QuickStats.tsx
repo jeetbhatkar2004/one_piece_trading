@@ -63,30 +63,28 @@ export function QuickStats() {
   ]
 
   return (
-    <div className="bg-black/5 border-y-2 border-black/20 py-12">
+    <div className="py-14">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="flex flex-wrap justify-center gap-x-12 gap-y-10 md:gap-x-16 md:gap-y-12">
           {stats.map((stat, idx) => {
             const Icon = stat.icon
             return (
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="text-center"
+                transition={{ delay: idx * 0.06, duration: 0.4 }}
+                className="flex items-baseline gap-3"
               >
-                <div className="flex justify-center mb-3">
-                  <div className={`w-12 h-12 rounded-full bg-white border-2 border-black/20 flex items-center justify-center ${stat.color}`}>
-                    <Icon className="w-6 h-6" />
+                <Icon className={`w-5 h-5 shrink-0 mt-0.5 ${stat.color}`} strokeWidth={2} />
+                <div>
+                  <div className={`font-display text-2xl md:text-3xl font-bold tracking-tight ${stat.color}`}>
+                    {stat.value}
                   </div>
-                </div>
-                <div className={`font-display text-3xl md:text-4xl font-bold mb-2 ${stat.color}`}>
-                  {stat.value}
-                </div>
-                <div className="text-xs font-mono text-black/60 uppercase tracking-wider">
-                  {stat.label}
+                  <div className="text-[11px] font-mono text-black/45 uppercase tracking-widest mt-0.5">
+                    {stat.label}
+                  </div>
                 </div>
               </motion.div>
             )

@@ -4,8 +4,6 @@ import { Navbar } from '@/components/Navbar'
 import { InteractiveHero } from '@/components/InteractiveHero'
 import { HomeNewsTicker } from '@/components/HomeNewsTicker'
 import { TopPerformers } from '@/components/TopPerformers'
-import { FeatureSection } from '@/components/FeatureSection'
-import { TrendingNow } from '@/components/TrendingNow'
 import { QuickStats } from '@/components/QuickStats'
 import { MangaBackground } from '@/components/MangaBackground'
 import { motion } from 'framer-motion'
@@ -30,12 +28,6 @@ export default function Home() {
         <div className="container mx-auto px-4 py-16">
           <TopPerformers />
         </div>
-
-        {/* Trending Now */}
-        <TrendingNow />
-
-        {/* Features Section */}
-        <FeatureSection />
 
         {/* Final CTA */}
         <motion.div

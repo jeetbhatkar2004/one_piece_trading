@@ -1,10 +1,12 @@
 'use client'
 
 // Subtle Grand Line inspired background:
-// - Soft parchment gradient
-// - Faint grid for a market / map vibe
+// - Base gradient
+// - One Piece world map outline (bottom layer)
+// - Faint grid on top for map vibe
 // - Very minimal animation for calmness
 
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 
 export function MangaBackground() {
@@ -22,17 +24,71 @@ export function MangaBackground() {
         }}
       />
 
-      {/* Light grid to hint at charts / maps */}
+      {/* One Piece world map outline - bottom layer, low opacity, soft lines */}
+      <div className="absolute inset-0 overflow-hidden">
+        <Image
+          src="/images/one_piece_map_outline.png"
+          alt=""
+          fill
+          className="object-contain opacity-[0.15]"
+          priority
+          sizes="100vw"
+        />
+      </div>
+
+      {/* Map-style coordinate grid: fine lines + bolder degree lines (above map) */}
       <div
-        className="absolute inset-0 opacity-[0.06]"
+        className="absolute inset-0 opacity-70"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(0,0,0,0.4) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(0,0,0,0.4) 1px, transparent 1px)
+            linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)
           `,
           backgroundSize: '40px 40px',
         }}
       />
+      {/* Bolder lines every 5 units (latitude/longitude style) */}
+      <div
+        className="absolute inset-0 opacity-40"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(0,0,0,0.06) 1.5px, transparent 1.5px),
+            linear-gradient(to bottom, rgba(0,0,0,0.06) 1.5px, transparent 1.5px)
+          `,
+          backgroundSize: '200px 200px',
+        }}
+      />
+      {/* Subtle compass roses - map flare */}
+      <svg
+        className="absolute top-6 right-6 w-14 h-14 text-black/[0.035]"
+        viewBox="0 0 32 32"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.5"
+      >
+        <circle cx="16" cy="16" r="14" />
+        <line x1="16" y1="4" x2="16" y2="12" />
+        <line x1="16" y1="20" x2="16" y2="28" />
+        <line x1="4" y1="16" x2="12" y2="16" />
+        <line x1="20" y1="16" x2="28" y2="16" />
+        <line x1="8" y1="8" x2="12" y2="12" />
+        <line x1="20" y1="20" x2="24" y2="24" />
+        <line x1="20" y1="8" x2="24" y2="12" />
+        <line x1="8" y1="20" x2="12" y2="24" />
+      </svg>
+      <svg
+        className="absolute bottom-6 left-6 w-12 h-12 text-black/[0.03]"
+        viewBox="0 0 32 32"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.5"
+      >
+        <circle cx="16" cy="16" r="14" />
+        <line x1="16" y1="4" x2="16" y2="12" />
+        <line x1="16" y1="20" x2="16" y2="28" />
+        <line x1="4" y1="16" x2="12" y2="16" />
+        <line x1="20" y1="16" x2="28" y2="16" />
+      </svg>
 
       {/* Very subtle moving highlight band (Grand Line) */}
       <motion.div

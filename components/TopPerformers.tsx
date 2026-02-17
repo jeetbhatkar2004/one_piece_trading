@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { CharacterAvatar } from './CharacterAvatar'
+import { getCharacterAccentColor } from '@/lib/character-descriptions'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-react'
@@ -55,6 +56,11 @@ export function TopPerformers() {
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ scale: 1.02, y: -5 }}
                   className="bg-white border-2 border-black/20 rounded-lg p-6 shadow-sm hover:border-op-red/50 transition-all relative overflow-hidden group cursor-pointer"
+                  style={{
+                    borderLeftWidth: '4px',
+                    borderLeftColor: getCharacterAccentColor(char.slug),
+                    boxShadow: `inset 0 0 60px ${getCharacterAccentColor(char.slug)}08`,
+                  }}
                 >
                   {/* Rank Badge */}
                   <div className="absolute top-4 right-4">

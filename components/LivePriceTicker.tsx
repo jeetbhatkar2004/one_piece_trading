@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CharacterAvatar } from './CharacterAvatar'
+import { getCharacterAccentColor } from '@/lib/character-descriptions'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
@@ -71,8 +72,13 @@ export function LivePriceTicker() {
                     }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.3 }}
-                    className="flex items-center gap-2 px-3 py-1.5 border border-black/10 rounded hover:border-black/30 transition-all min-w-[180px]"
+                    className="relative overflow-hidden flex items-center gap-2 px-3 py-1.5 border border-black/10 rounded hover:border-black/30 transition-all min-w-[180px]"
+                    style={{ borderLeftWidth: '3px', borderLeftColor: getCharacterAccentColor(char.slug) }}
                   >
+                    <div
+                      className="absolute right-0 top-0 bottom-0 w-12 pointer-events-none rounded-r"
+                      style={{ background: `linear-gradient(to right, transparent 30%, ${getCharacterAccentColor(char.slug)}18 100%)` }}
+                    />
                     <CharacterAvatar slug={char.slug} displayName={char.displayName} size="sm" />
                     <div className="flex-1 min-w-0">
                       <div className="font-mono text-xs font-semibold text-black truncate">

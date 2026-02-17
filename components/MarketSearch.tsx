@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CharacterAvatar } from './CharacterAvatar'
+import { getCharacterAccentColor } from '@/lib/character-descriptions'
 import Link from 'next/link'
 
 interface Character {
@@ -122,6 +123,7 @@ export function MarketSearch({ onSearch, placeholder = 'Search tokens by name...
                   whileHover={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
                   onClick={() => handleSelect(char)}
                   className="flex items-center gap-3 p-3 border-b border-black/10 last:border-b-0 cursor-pointer"
+                  style={{ borderLeftWidth: '4px', borderLeftColor: getCharacterAccentColor(char.slug) }}
                 >
                   <CharacterAvatar slug={char.slug} displayName={char.displayName} size="sm" />
                   <div className="flex-1 min-w-0">

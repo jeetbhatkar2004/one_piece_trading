@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Navbar } from '@/components/Navbar'
+import { storeRefFromUrl, getStoredRef, clearStoredRef } from '@/components/ReferFriendModal'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -19,6 +20,10 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [otpSent, setOtpSent] = useState(false)
   const [devOtpCode, setDevOtpCode] = useState<string | null>(null)
+
+  useEffect(() => {
+    storeRefFromUrl()
+  }, [])
 
   const handleRequestOTP = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,10 +67,17 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
+      const refData = getStoredRef()
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code: otp, username, password }),
+        body: JSON.stringify({
+          email,
+          code: otp,
+          username,
+          password,
+          ...(refData && { refCode: refData.refCode, refClickedAt: refData.refClickedAt }),
+        }),
       })
 
       const data = await res.json()
@@ -75,6 +87,7 @@ export default function RegisterPage() {
         return
       }
 
+      clearStoredRef()
       router.push('/login?registered=true')
     } catch (err) {
       setError('Registration failed')

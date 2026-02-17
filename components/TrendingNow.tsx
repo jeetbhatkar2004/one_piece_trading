@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { CharacterAvatar } from './CharacterAvatar'
+import { getCharacterAccentColor } from '@/lib/character-descriptions'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-react'
@@ -70,8 +71,13 @@ export function TrendingNow() {
               <Link key={char.id} href={`/c/${char.slug}`}>
                 <motion.div
                   whileHover={{ x: 5, backgroundColor: 'rgba(22, 163, 74, 0.05)' }}
-                  className="flex items-center justify-between p-3 bg-green-500/5 border border-green-500/20 rounded hover:border-green-500/40 transition-all"
+                  className="relative overflow-hidden flex items-center justify-between p-3 bg-green-500/5 border border-green-500/20 rounded hover:border-green-500/40 transition-all"
+                  style={{ borderLeftWidth: '4px', borderLeftColor: getCharacterAccentColor(char.slug) }}
                 >
+                  <div
+                    className="absolute right-0 top-0 bottom-0 w-20 pointer-events-none rounded-r"
+                    style={{ background: `linear-gradient(to right, transparent 40%, ${getCharacterAccentColor(char.slug)}18 100%)` }}
+                  />
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 flex items-center justify-center bg-green-500/20 rounded font-mono text-xs font-bold text-green-700">
                       #{idx + 1}
@@ -110,8 +116,13 @@ export function TrendingNow() {
               <Link key={char.id} href={`/c/${char.slug}`}>
                 <motion.div
                   whileHover={{ x: 5, backgroundColor: 'rgba(220, 38, 38, 0.05)' }}
-                  className="flex items-center justify-between p-3 bg-red-500/5 border border-red-500/20 rounded hover:border-red-500/40 transition-all"
+                  className="relative overflow-hidden flex items-center justify-between p-3 bg-red-500/5 border border-red-500/20 rounded hover:border-red-500/40 transition-all"
+                  style={{ borderLeftWidth: '4px', borderLeftColor: getCharacterAccentColor(char.slug) }}
                 >
+                  <div
+                    className="absolute right-0 top-0 bottom-0 w-20 pointer-events-none rounded-r"
+                    style={{ background: `linear-gradient(to right, transparent 40%, ${getCharacterAccentColor(char.slug)}18 100%)` }}
+                  />
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 flex items-center justify-center bg-red-500/20 rounded font-mono text-xs font-bold text-red-700">
                       #{idx + 1}

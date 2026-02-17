@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { CharacterAvatar } from './CharacterAvatar'
+import { getCharacterAccentColor } from '@/lib/character-descriptions'
 import Link from 'next/link'
 
 interface Character {
@@ -54,8 +55,13 @@ export function PriceTicker() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: idx * 0.1 }}
                   whileHover={{ x: 5, backgroundColor: 'rgba(0, 0, 0, 0.03)' }}
-                  className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded hover:border-green-300 transition-all"
+                  className="relative overflow-hidden flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded hover:border-green-300 transition-all"
+                  style={{ borderLeftWidth: '4px', borderLeftColor: getCharacterAccentColor(char.slug) }}
                 >
+                  <div
+                    className="absolute right-0 top-0 bottom-0 w-20 pointer-events-none rounded-r"
+                    style={{ background: `linear-gradient(to right, transparent 40%, ${getCharacterAccentColor(char.slug)}18 100%)` }}
+                  />
                   <div className="flex items-center gap-3">
                     <CharacterAvatar slug={char.slug} displayName={char.displayName} size="sm" />
                     <div>
@@ -85,8 +91,13 @@ export function PriceTicker() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: idx * 0.1 }}
                   whileHover={{ x: -5, backgroundColor: 'rgba(0, 0, 0, 0.03)' }}
-                  className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded hover:border-red-300 transition-all"
+                  className="relative overflow-hidden flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded hover:border-red-300 transition-all"
+                  style={{ borderLeftWidth: '4px', borderLeftColor: getCharacterAccentColor(char.slug) }}
                 >
+                  <div
+                    className="absolute right-0 top-0 bottom-0 w-20 pointer-events-none rounded-r"
+                    style={{ background: `linear-gradient(to right, transparent 40%, ${getCharacterAccentColor(char.slug)}18 100%)` }}
+                  />
                   <div className="flex items-center gap-3">
                     <CharacterAvatar slug={char.slug} displayName={char.displayName} size="sm" />
                     <div>

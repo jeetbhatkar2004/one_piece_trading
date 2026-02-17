@@ -4,10 +4,13 @@ import bcrypt from 'bcryptjs'
 import { verifyOTPSchema } from '@/lib/validation'
 import { verifyOTP } from '@/lib/otp'
 
+const REFERRAL_BONUS_BERRIES = 500
+const REFERRAL_VALID_DAYS = 7
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { username, email, password, code } = verifyOTPSchema.parse(body)
+    const { username, email, password, code, refCode, refClickedAt } = verifyOTPSchema.parse(body)
 
     // Verify OTP
     const isValidOTP = await verifyOTP(email, code)
@@ -38,6 +41,21 @@ export async function POST(req: NextRequest) {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10)
 
+    // Validate referral: must be within 7 days of link click
+    let referrerId: string | null = null
+    if (refCode && refClickedAt) {
+      const refAgeMs = Date.now() - refClickedAt
+      if (refAgeMs <= REFERRAL_VALID_DAYS * 24 * 60 * 60 * 1000) {
+        const referrer = await prisma.user.findUnique({
+          where: { username: refCode },
+          include: { wallet: true },
+        })
+        if (referrer && referrer.username !== username) {
+          referrerId = referrer.id
+        }
+      }
+    }
+
     // Create user and wallet in transaction
     const user = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
@@ -55,6 +73,30 @@ export async function POST(req: NextRequest) {
           berriesBalance: 1000, // Starting balance
         },
       })
+
+      // Award referral bonus if valid
+      if (referrerId) {
+        const existingReferral = await tx.referral.findUnique({
+          where: { referredUserId: newUser.id },
+        })
+        if (!existingReferral) {
+          await tx.referral.create({
+            data: {
+              referrerId,
+              referredUserId: newUser.id,
+              berriesAwarded: REFERRAL_BONUS_BERRIES,
+            },
+          })
+          await tx.wallet.update({
+            where: { userId: referrerId },
+            data: {
+              berriesBalance: {
+                increment: REFERRAL_BONUS_BERRIES,
+              },
+            },
+          })
+        }
+      }
 
       return newUser
     })

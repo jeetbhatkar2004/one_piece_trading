@@ -13,6 +13,7 @@ import { VolumeLeaderboard } from '@/components/VolumeLeaderboard'
 import { MostVolatile } from '@/components/MostVolatile'
 import { MangaBackground } from '@/components/MangaBackground'
 import { RecommendCharacterButton } from '@/components/RecommendCharacterButton'
+import { ClosePositionPanel } from '@/components/ClosePositionPanel'
 import { motion } from 'framer-motion'
 
 export default function TradingPage() {
@@ -47,6 +48,9 @@ export default function TradingPage() {
         >
           <MarketSearch onSearch={setSearchQuery} />
         </motion.div>
+
+        {/* Close Positions - Below Search */}
+        <ClosePositionPanel />
 
         {/* Market Summary */}
         <motion.div

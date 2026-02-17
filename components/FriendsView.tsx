@@ -102,7 +102,7 @@ export function FriendsView() {
     <div className="space-y-8">
       {/* Add Friend Section */}
       <div className="bg-white border-2 border-black/20 rounded-lg p-6 shadow-sm">
-        <h2 className="font-display text-3xl text-black mb-4">ADD FRIEND</h2>
+        <h2 className="text-3xl text-black mb-4">ADD FRIEND</h2>
         <div className="flex gap-3">
           <input
             type="text"
@@ -137,7 +137,7 @@ export function FriendsView() {
       {/* Pending Received Requests */}
       {friendsData?.pendingReceived && friendsData.pendingReceived.length > 0 && (
         <div className="bg-white border-2 border-black/20 rounded-lg p-6 shadow-sm">
-          <h2 className="font-display text-3xl text-black mb-4">PENDING REQUESTS</h2>
+          <h2 className="text-3xl text-black mb-4">PENDING REQUESTS</h2>
           <div className="space-y-3">
             {friendsData.pendingReceived.map((request) => (
               <motion.div
@@ -180,7 +180,7 @@ export function FriendsView() {
 
       {/* Friends List */}
       <div className="bg-white border-2 border-black/20 rounded-lg p-6 shadow-sm">
-        <h2 className="font-display text-3xl text-black mb-4">FRIENDS ({friendsData?.friends.length || 0})</h2>
+        <h2 className="text-3xl text-black mb-4">FRIENDS ({friendsData?.friends.length || 0})</h2>
         {friendsData?.friends && friendsData.friends.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {friendsData.friends.map((friend) => (
@@ -212,7 +212,7 @@ export function FriendsView() {
       {/* Pending Sent Requests */}
       {friendsData?.pendingSent && friendsData.pendingSent.length > 0 && (
         <div className="bg-white border-2 border-black/20 rounded-lg p-6 shadow-sm">
-          <h2 className="font-display text-3xl text-black mb-4">SENT REQUESTS</h2>
+          <h2 className="text-3xl text-black mb-4">SENT REQUESTS</h2>
           <div className="space-y-3">
             {friendsData.pendingSent.map((request) => (
               <motion.div

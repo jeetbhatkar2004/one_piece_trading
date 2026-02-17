@@ -10,6 +10,8 @@ interface ExecuteTradeParams {
   amountIn: Decimal
   slippageBps: number
   clientNonce: string
+  /** Override pool fee (e.g. 0 for fee-free close) */
+  overrideFeeBps?: number
 }
 
 export async function executeTrade({
@@ -19,6 +21,7 @@ export async function executeTrade({
   amountIn,
   slippageBps,
   clientNonce,
+  overrideFeeBps,
 }: ExecuteTradeParams) {
   return await prisma.$transaction(async (tx) => {
     // Lock wallet, position, and pool rows
@@ -77,7 +80,7 @@ export async function executeTrade({
     // Calculate quote
     const reserveBerries = new Decimal(pool.reserveBerries)
     const reserveTokens = new Decimal(pool.reserveTokens)
-    const feeBps = pool.feeBps
+    const feeBps = overrideFeeBps !== undefined ? overrideFeeBps : pool.feeBps
 
     let quote
     if (side === 'BUY') {
@@ -256,6 +259,7 @@ export async function executeTrade({
       newWalletBalance: updatedWallet!.berriesBalance,
       newPositionBalance: updatedPosition!.tokensBalance,
       priceAfter: quote.priceAfter.toNumber(),
+      amountOut: quote.amountOut.toNumber(),
     }
   })
 }

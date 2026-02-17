@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-react'
 import { CharacterAvatar } from './CharacterAvatar'
+import { getCharacterAccentColor } from '@/lib/character-descriptions'
 
 interface Character {
   id: string
@@ -103,6 +104,11 @@ export function MarketsGrid({ searchQuery = '' }: MarketsGridProps) {
               transition={{ delay: index * 0.02 }}
               whileHover={{ scale: 1.02, y: -2 }}
               className="bg-white border-2 border-black/20 rounded-lg p-5 shadow-sm hover:border-op-red/50 transition-all relative group min-h-[300px] flex flex-col"
+              style={{
+                borderLeftWidth: '4px',
+                borderLeftColor: getCharacterAccentColor(char.slug),
+                boxShadow: `inset 0 0 80px ${getCharacterAccentColor(char.slug)}06`,
+              }}
             >
               {/* Rank Badge */}
               <div className="absolute top-3 right-3">

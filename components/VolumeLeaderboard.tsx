@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { CharacterAvatar } from './CharacterAvatar'
+import { getCharacterAccentColor } from '@/lib/character-descriptions'
 import { TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -49,8 +50,13 @@ export function VolumeLeaderboard() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: idx * 0.05 }}
               whileHover={{ x: 5, backgroundColor: 'rgba(0, 0, 0, 0.03)' }}
-              className="flex items-center justify-between p-3 bg-black/5 border border-black/10 rounded hover:border-black/30 transition-all"
+              className="relative overflow-hidden flex items-center justify-between p-3 bg-black/5 border border-black/10 rounded hover:border-black/30 transition-all"
+              style={{ borderLeftWidth: '4px', borderLeftColor: getCharacterAccentColor(char.slug) }}
             >
+              <div
+                className="absolute right-0 top-0 bottom-0 w-20 pointer-events-none rounded-r"
+                style={{ background: `linear-gradient(to right, transparent 40%, ${getCharacterAccentColor(char.slug)}18 100%)` }}
+              />
               <div className="flex items-center gap-3">
                 <div className="w-6 h-6 flex items-center justify-center bg-black/10 rounded font-mono text-xs font-bold text-black">
                   {idx + 1}

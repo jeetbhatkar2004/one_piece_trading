@@ -50,7 +50,7 @@ export default function LoginPage() {
             className="bg-white border-2 border-black/20 rounded-lg p-8 shadow-sm"
           >
             <div className="text-center mb-8">
-              <h1 className="font-display text-5xl text-black mb-2">WELCOME BACK</h1>
+              <h1 className="text-5xl text-black mb-2">WELCOME BACK</h1>
               <div className="accent-line w-32 mx-auto my-4"></div>
               <p className="text-black/60 font-mono text-sm uppercase tracking-wider">Login to continue trading</p>
             </div>

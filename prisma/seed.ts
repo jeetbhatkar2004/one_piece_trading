@@ -1,9 +1,27 @@
 import { PrismaClient } from '@prisma/client'
 import Decimal from 'decimal.js'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 import { getAllCharacters } from '../lib/character-descriptions'
 
 const prisma = new PrismaClient()
 const characters = getAllCharacters()
+
+// Load character prices (0-100 berries/token) - used for initial pool state
+const pricesPath = join(__dirname, '../scripts/character-prices.json')
+const characterPrices: Record<string, number> = (() => {
+  try {
+    return JSON.parse(readFileSync(pricesPath, 'utf-8'))
+  } catch {
+    return {}
+  }
+})()
+
+function getStartingPrice(slug: string): Decimal {
+  const price = characterPrices[slug] ?? 50
+  const clamped = Math.max(0, Math.min(100, price))
+  return new Decimal(clamped)
+}
 
 async function main() {
   console.log('Starting seed...')
@@ -23,26 +41,31 @@ async function main() {
       },
     })
 
-    // Initialize pool with starting reserves
-    // Base reserve: 100,000 berries
-    // Starting price varies by character (30-100 berries per token)
+    // Initialize pool with starting reserves from character-prices.json (0-100 berries/token)
     const baseReserve = new Decimal(100000)
-    const startingPrice = new Decimal(Math.random() * 70 + 30) // 30-100 berries/token
+    const startingPrice = getStartingPrice(char.slug)
     const startingTokens = baseReserve.div(startingPrice)
 
     await prisma.pool.upsert({
       where: { characterId: character.id },
-      update: {},
+      update: {
+        feeBps: 20,
+        reserveBerries: baseReserve,
+        reserveTokens: startingTokens,
+      },
       create: {
         characterId: character.id,
         reserveBerries: baseReserve,
         reserveTokens: startingTokens,
-        feeBps: 100, // 1% fee
+        feeBps: 20, // 0.2% fee
       },
     })
 
+    // Delete existing price candles so we regenerate with the new starting price
+    await prisma.priceCandle.deleteMany({ where: { characterId: character.id } })
+
     // Create initial price candles for chart display (last 7 days, one per day)
-    // Simulate realistic price movements
+    // Simulate realistic price movements from the new starting price
     const now = new Date()
     let currentPrice = startingPrice
     

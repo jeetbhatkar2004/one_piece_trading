@@ -77,7 +77,7 @@ export function CharacterAvatar({
     return (
       <div className={`flex items-center gap-2 ${className}`}>
         <div
-          className={`${sizeClasses[size]} rounded-full flex items-center justify-center text-white shadow-lg border-2 border-white/20 font-bold`}
+          className={`${sizeClasses[size]} rounded-full flex items-center justify-center text-white shadow-lg border border-white/20 font-bold`}
           style={{ background: ringGradient }}
           title={displayName}
         >
@@ -95,7 +95,7 @@ export function CharacterAvatar({
     return (
       <div className={`flex items-center gap-2 ${className}`}>
         <div
-          className={`${sizeClasses[size]} rounded-full flex items-center justify-center text-white shadow-lg border-2 border-white/20 animate-pulse`}
+          className={`${sizeClasses[size]} rounded-full flex items-center justify-center text-white shadow-lg border border-white/20 animate-pulse`}
           style={{ background: ringGradient }}
           title={displayName}
         >
@@ -108,12 +108,12 @@ export function CharacterAvatar({
     )
   }
 
-  // Colored ring around black center - image on black (no blending), ring adds character
-  const innerSize = Math.max(16, sizePixels[size] - 12) // p-1.5 = 6px each side
+  // Colored ring around black center - thin ring for subtle character accent
+  const innerSize = Math.max(16, sizePixels[size] - 4) // p-0.5 = 2px each side
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <div
-        className={`${sizeClasses[size]} rounded-full p-1.5 shadow-lg border-2 border-white/20 overflow-hidden flex items-center justify-center shrink-0`}
+        className={`${sizeClasses[size]} rounded-full p-0.5 shadow-lg border border-white/20 overflow-hidden flex items-center justify-center shrink-0`}
         style={{ background: ringGradient }}
         title={displayName}
       >

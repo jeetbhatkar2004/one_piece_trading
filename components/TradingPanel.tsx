@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { celebrateTrade } from '@/lib/confetti'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import { ConfirmCloseModal } from './ConfirmCloseModal'
 
 interface CharacterData {
   id: string
@@ -23,15 +24,60 @@ interface Quote {
   minOut: string
 }
 
+interface Position {
+  characterSlug: string
+  characterName: string
+  tokensBalance: string
+  avgCostBerries: string
+  marketValue: string
+  unrealizedPL?: string
+  unrealizedPLPercent?: string
+}
+
 export function TradingPanel({ character }: { character: CharacterData }) {
   const { data: session } = useSession()
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [side, setSide] = useState<'BUY' | 'SELL'>('BUY')
   const [amountIn, setAmountIn] = useState('')
-  const [slippageBps, setSlippageBps] = useState(100) // 1%
+  const [slippageBps, setSlippageBps] = useState(20) // 0.2%
   const [quote, setQuote] = useState<Quote | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false)
+
+  const { data: portfolio } = useQuery<{ positions: Position[] }>({
+    queryKey: ['portfolio'],
+    queryFn: async () => {
+      const res = await fetch('/api/portfolio')
+      if (!res.ok) throw new Error('Failed to fetch')
+      return res.json()
+    },
+    enabled: !!session,
+  })
+
+  const position = portfolio?.positions?.find((p) => p.characterSlug === character.slug)
+
+  const closeMutation = useMutation({
+    mutationFn: async (slug: string) => {
+      const res = await fetch('/api/position/close', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to close position')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      setShowCloseConfirm(false)
+      queryClient.invalidateQueries({ queryKey: ['portfolio'] })
+      queryClient.invalidateQueries({ queryKey: ['character', character.slug] })
+    },
+    onError: () => setShowCloseConfirm(false),
+  })
 
   // Check market status
   const { data: marketStatus } = useQuery({
@@ -183,6 +229,27 @@ export function TradingPanel({ character }: { character: CharacterData }) {
     >
       <h2 className="font-display text-3xl text-black mb-6">TRADE</h2>
 
+      {position && (
+        <motion.button
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          onClick={() => setShowCloseConfirm(true)}
+          disabled={closeMutation.isPending}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
+          className="w-full mb-4 py-3 rounded font-mono text-sm uppercase tracking-wider border-2 border-op-red text-op-red hover:bg-op-red/10 flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+        >
+          {closeMutation.isPending ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Closing Position...
+            </>
+          ) : (
+            'Close Position'
+          )}
+        </motion.button>
+      )}
+
       <div className="flex gap-2 mb-6">
         <motion.button
           onClick={() => {
@@ -243,6 +310,7 @@ export function TradingPanel({ character }: { character: CharacterData }) {
             onChange={(e) => setSlippageBps(parseInt(e.target.value))}
             className="w-full px-4 py-3 bg-white border-2 border-black/20 rounded text-black font-mono focus:outline-none focus:ring-2 focus:ring-op-red focus:border-op-red"
           >
+            <option value={20}>0.2%</option>
             <option value={50}>0.5%</option>
             <option value={100}>1%</option>
             <option value={200}>2%</option>
@@ -307,6 +375,21 @@ export function TradingPanel({ character }: { character: CharacterData }) {
           {loading ? 'Executing...' : `${side} ${character.displayName}`}
         </motion.button>
       </div>
+
+      {position && (
+        <ConfirmCloseModal
+          isOpen={showCloseConfirm}
+          onClose={() => !closeMutation.isPending && setShowCloseConfirm(false)}
+          onConfirm={() => closeMutation.mutate(character.slug)}
+          characterName={position.characterName}
+          tokensBalance={position.tokensBalance}
+          marketValue={position.marketValue}
+          avgCostBerries={position.avgCostBerries}
+          unrealizedPL={position.unrealizedPL}
+          unrealizedPLPercent={position.unrealizedPLPercent}
+          isClosing={closeMutation.isPending}
+        />
+      )}
     </motion.div>
   )
 }

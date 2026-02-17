@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { CharacterAvatar } from './CharacterAvatar'
+import { getCharacterAccentColor } from '@/lib/character-descriptions'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-react'
 
@@ -146,7 +147,8 @@ export function MarketsTable({ searchQuery = '' }: MarketsTableProps) {
                 key={char.id}
                 variants={itemVariants}
                 whileHover={{ backgroundColor: 'rgba(0, 0, 0, 0.03)' }}
-                className="transition-colors duration-200 cursor-pointer border-l-2 border-transparent hover:border-op-red"
+                className="transition-colors duration-200 cursor-pointer"
+                style={{ borderLeftWidth: '4px', borderLeftColor: getCharacterAccentColor(char.slug) }}
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
@@ -211,7 +213,10 @@ export function MarketsTable({ searchQuery = '' }: MarketsTableProps) {
                     ₿{char.liquidity.toLocaleString()}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <td
+                  className="px-6 py-4 whitespace-nowrap text-sm font-medium relative overflow-hidden"
+                  style={{ background: `linear-gradient(to right, transparent 60%, ${getCharacterAccentColor(char.slug)}12 100%)` }}
+                >
                   <Link href={`/c/${char.slug}`}>
                     <motion.div
                       className="bg-op-red hover:bg-op-orange text-white px-4 py-2 rounded font-mono text-xs uppercase tracking-wider inline-flex items-center gap-2 border border-op-red/50"

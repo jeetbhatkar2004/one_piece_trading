@@ -1,26 +1,21 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useSession, signOut } from 'next-auth/react'
 import { motion } from 'framer-motion'
+import { ReferFriendModal } from './ReferFriendModal'
+import { Users } from 'lucide-react'
 
 export function Navbar() {
   const { data: session } = useSession()
+  const [showReferModal, setShowReferModal] = useState(false)
 
   return (
     <nav className="bg-white border-b border-black/10 sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="font-display text-3xl text-black hover:text-op-red transition-colors flex items-center gap-2">
-            <Image
-              src="/images/logo.png"
-              alt="The Grand Line Exchange"
-              width={100}
-              height={100}
-              className="object-contain"
-              unoptimized
-            />
+          <Link href="/" className="font-display text-3xl text-black hover:text-op-red transition-colors flex items-center">
             <span>
               <span className="text-black">THE GRAND LINE</span>{' '}
               <span className="text-op-red">EXCHANGE</span>
@@ -35,6 +30,15 @@ export function Navbar() {
             </Link>
             {session ? (
               <>
+                <motion.button
+                  onClick={() => setShowReferModal(true)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-1.5 text-black/70 hover:text-op-red transition-colors font-medium text-sm uppercase tracking-wider"
+                >
+                  <Users className="w-4 h-4" />
+                  Refer a Friend
+                </motion.button>
                 <Link
                   href="/feed"
                   className="text-black/70 hover:text-op-red transition-colors font-medium text-sm uppercase tracking-wider"
@@ -92,6 +96,14 @@ export function Navbar() {
           </div>
         </div>
       </div>
+
+      {session?.user?.username && (
+        <ReferFriendModal
+          isOpen={showReferModal}
+          onClose={() => setShowReferModal(false)}
+          username={session.user.username}
+        />
+      )}
     </nav>
   )
 }

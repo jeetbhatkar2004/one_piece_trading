@@ -20,7 +20,9 @@ model User {
   
   wallet        Wallet?
   positions     Position[]
+  closedPositions ClosedPosition[]
   trades        Trade[]
+  referralsGiven Referral[] @relation("Referrer")
   snapshots     LeaderboardSnapshot[]
   sentFriendRequests     Friendship[] @relation("FriendRequestSender")
   receivedFriendRequests Friendship[] @relation("FriendRequestReceiver")
@@ -107,6 +109,7 @@ model Character {
   
   pool          Pool?
   positions     Position[]
+  closedPositions ClosedPosition[]
   trades        Trade[]
   candles       PriceCandle[]
   
@@ -118,7 +121,7 @@ model Pool {
   character     Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
   reserveBerries Decimal  @map("reserve_berries")
   reserveTokens  Decimal  @map("reserve_tokens")
-  feeBps        Int       @default(100) @map("fee_bps")
+  feeBps        Int       @default(20) @map("fee_bps")
   version       Int       @default(0)
   updatedAt     DateTime  @updatedAt @map("updated_at")
   
@@ -136,6 +139,24 @@ model Position {
   
   @@id([userId, characterId])
   @@map("positions")
+}
+
+model ClosedPosition {
+  id              String    @id @default(uuid())
+  userId          String    @map("user_id")
+  characterId     String    @map("character_id")
+  character       Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokensClosed    Decimal   @map("tokens_closed")
+  avgCostBerries  Decimal   @map("avg_cost_berries")
+  closePrice      Decimal   @map("close_price")
+  berriesReceived Decimal   @map("berries_received")
+  realizedPnL     Decimal   @map("realized_pnl")
+  closedAt       DateTime  @default(now()) @map("closed_at")
+  
+  @@index([userId])
+  @@index([userId, closedAt])
+  @@map("closed_positions")
 }
 
 model Trade {
@@ -212,4 +233,17 @@ model MarketConfig {
   updatedAt     DateTime  @updatedAt @map("updated_at")
   
   @@map("market_config")
+}
+
+model Referral {
+  id              String   @id @default(uuid())
+  referrerId      String   @map("referrer_id")
+  referredUserId  String   @unique @map("referred_user_id")
+  berriesAwarded  Int      @map("berries_awarded")
+  createdAt       DateTime @default(now()) @map("created_at")
+  
+  referrer        User     @relation("Referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  
+  @@index([referrerId])
+  @@map("referrals")
 }

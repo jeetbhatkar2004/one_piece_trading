@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-react'
 import { CharacterAvatar } from './CharacterAvatar'
+import { getCharacterAccentColor } from '@/lib/character-descriptions'
 
 interface FriendTrade {
   id: string
@@ -72,6 +73,7 @@ export function FriendsTradesFeed() {
             transition={{ delay: index * 0.05 }}
             whileHover={{ x: 5, backgroundColor: 'rgba(0, 0, 0, 0.03)' }}
             className="flex items-center justify-between p-4 bg-black/5 rounded border border-black/10 hover:border-op-red/50 transition-all"
+            style={{ borderLeftWidth: '4px', borderLeftColor: getCharacterAccentColor(trade.character.slug) }}
           >
             <div className="flex items-center gap-4 flex-1">
               <div className="flex items-center gap-2">

@@ -12,6 +12,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { CharacterAvatar } from './CharacterAvatar'
+import { getCharacterAccentColor } from '@/lib/character-descriptions'
 import { motion } from 'framer-motion'
 
 interface Character {
@@ -133,19 +134,7 @@ export function TopTokensChart() {
     .sort((a, b) => b.liquidity - a.liquidity)
     .slice(0, 10)
 
-  // Color palette - using One Piece theme colors
-  const colors = [
-    '#dc2626', // Red
-    '#ea580c', // Orange
-    '#fbbf24', // Yellow
-    '#000000', // Black
-    '#dc2626', // Red
-    '#ea580c', // Orange
-    '#fbbf24', // Yellow
-    '#000000', // Black
-    '#dc2626', // Red
-    '#ea580c', // Orange
-  ]
+  // Use character accent colors for chart lines and legend
 
   return (
     <motion.div
@@ -190,12 +179,12 @@ export function TopTokensChart() {
           <Legend
             wrapperStyle={{ display: 'none' }}
           />
-          {top10.map((char, index) => (
+          {top10.map((char) => (
             <Line
               key={char.id}
               type="monotone"
               dataKey={char.slug}
-              stroke={colors[index % colors.length]}
+              stroke={getCharacterAccentColor(char.slug)}
               strokeWidth={2}
               dot={false}
               name={char.displayName}
@@ -219,10 +208,11 @@ export function TopTokensChart() {
               transition={{ delay: 0.1 * index }}
               whileHover={{ scale: 1.1, y: -5 }}
               className="flex items-center gap-2 bg-black/5 px-3 py-2 rounded border border-black/20 hover:border-op-red/50 transition-colors cursor-pointer"
+              style={{ borderLeftWidth: '4px', borderLeftColor: getCharacterAccentColor(char.slug) }}
             >
               <div
                 className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: colors[index % colors.length] }}
+                style={{ backgroundColor: getCharacterAccentColor(char.slug) }}
               ></div>
               <CharacterAvatar slug={char.slug} displayName={char.displayName} size="sm" />
               <span className="text-black text-xs font-mono">{char.displayName}</span>

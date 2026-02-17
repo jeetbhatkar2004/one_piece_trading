@@ -69,6 +69,48 @@ export async function GET() {
       })
     )
 
+    // Fetch closed positions (history)
+    let closedPositionsWithDetails: Array<{
+      id: string
+      characterSlug: string
+      characterName: string
+      tokensClosed: string
+      avgCostBerries: string
+      closePrice: string
+      berriesReceived: string
+      realizedPnL: string
+      realizedPnLPercent: string
+      closedAt: string
+    }> = []
+
+    try {
+      const closedPositions = await prisma.closedPosition.findMany({
+        where: { userId: session.user.userId },
+        include: { character: true },
+        orderBy: { closedAt: 'desc' },
+      })
+
+      closedPositionsWithDetails = closedPositions.map((cp: typeof closedPositions[0]) => ({
+      id: cp.id,
+      characterSlug: cp.character.slug,
+      characterName: cp.character.displayName,
+      tokensClosed: cp.tokensClosed.toString(),
+      avgCostBerries: cp.avgCostBerries.toString(),
+      closePrice: cp.closePrice.toString(),
+      berriesReceived: cp.berriesReceived.toString(),
+      realizedPnL: cp.realizedPnL.toString(),
+      realizedPnLPercent: new Decimal(cp.avgCostBerries).mul(cp.tokensClosed).isZero()
+        ? '0'
+        : new Decimal(cp.realizedPnL)
+            .div(new Decimal(cp.avgCostBerries).mul(cp.tokensClosed))
+            .mul(100)
+            .toString(),
+      closedAt: cp.closedAt.toISOString(),
+    }))
+    } catch (e) {
+      console.warn('ClosedPosition fetch skipped:', e)
+    }
+
     // Calculate total net worth
     const berriesBalance = new Decimal(wallet.berriesBalance)
     const positionsValue = positionsWithValue.reduce(
@@ -80,6 +122,7 @@ export async function GET() {
     return NextResponse.json({
       berriesBalance: berriesBalance.toString(),
       positions: positionsWithValue.filter(Boolean),
+      closedPositions: closedPositionsWithDetails,
       netWorth: netWorth.toString(),
     })
   } catch (error) {
