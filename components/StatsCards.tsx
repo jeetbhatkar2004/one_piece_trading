@@ -69,7 +69,7 @@ export function StatsCards() {
   const stats = [
     {
       label: 'Total Liquidity',
-      value: `₿${(totalLiquidity / 1000).toFixed(1)}K`,
+      value: `₿${totalLiquidity >= 1000000 ? (totalLiquidity / 1000000).toFixed(2) + 'M' : (totalLiquidity / 1000).toFixed(1) + 'K'}`,
       icon: DollarSign,
       accent: 'op-red',
       change: null, // No change value

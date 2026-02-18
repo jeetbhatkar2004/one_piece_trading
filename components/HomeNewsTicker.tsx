@@ -55,7 +55,7 @@ function buildHeadlines(characters: Character[]): string[] {
     headlines.push(
       `${mostLiquid.displayName} leads liquidity with ₿${(
         mostLiquid.liquidity / 1000
-      ).toFixed(1)}K traded on The Grand Line Exchange.`
+      ).toFixed(1)}K on The Grand Line Exchange.`
     )
   }
 

@@ -14,6 +14,7 @@ interface Character {
   price: number
   change24h: number
   liquidity: number
+  volume24h?: number
 }
 
 export function VolumeLeaderboard() {
@@ -31,9 +32,9 @@ export function VolumeLeaderboard() {
     return null
   }
 
-  // Sort by liquidity (trading volume proxy)
+  // Sort by real 24h volume, fallback to liquidity if no volume yet
   const topVolume = [...characters]
-    .sort((a, b) => b.liquidity - a.liquidity)
+    .sort((a, b) => (b.volume24h ?? 0) - (a.volume24h ?? 0))
     .slice(0, 10)
 
   return (
@@ -69,7 +70,9 @@ export function VolumeLeaderboard() {
               </div>
               <div className="text-right">
                 <div className="font-mono text-sm font-semibold text-black">
-                  ₿{(char.liquidity / 1000).toFixed(1)}K
+                  ₿{((char.volume24h ?? 0) >= 1000
+                    ? ((char.volume24h ?? 0) / 1000).toFixed(1) + 'K'
+                    : (char.volume24h ?? 0).toFixed(0))}
                 </div>
                 <div className={`font-mono text-xs ${char.change24h >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {char.change24h >= 0 ? '+' : ''}

@@ -28,6 +28,7 @@ export const quoteSchema = z.object({
   slug: z.string().min(1),
   side: z.enum(['BUY', 'SELL']),
   amountIn: z.string().regex(/^\d+(\.\d+)?$/),
+  amountInType: z.enum(['berries', 'tokens']).optional().default('berries'), // For BUY: berries or tokens
   slippageBps: z.number().int().min(0).max(10000).optional().default(20),
 })
 

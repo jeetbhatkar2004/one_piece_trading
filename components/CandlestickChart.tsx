@@ -170,7 +170,7 @@ export function CandlestickChart({ candles, height = 400 }: CandlestickChartProp
       {/* Chart with OHLC visualization */}
       <div className="bg-white border-2 border-black/10 rounded p-4">
         <ResponsiveContainer width="100%" height={height}>
-          <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 60 }}>
+          <ComposedChart data={filteredData} margin={{ top: 10, right: 10, left: 10, bottom: 60 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
             <XAxis
               dataKey="time"
@@ -249,7 +249,7 @@ export function CandlestickChart({ candles, height = 400 }: CandlestickChartProp
             
             {/* Volume bars with color coding */}
             <Bar yAxisId="volume" dataKey="volume" fill="rgba(0, 0, 0, 0.15)" name="Volume">
-              {chartData.map((entry, index) => (
+              {filteredData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.isUp ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)'} />
               ))}
             </Bar>

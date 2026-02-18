@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
+import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { ReferFriendModal } from './ReferFriendModal'
 import { Users } from 'lucide-react'
@@ -10,6 +11,19 @@ import { Users } from 'lucide-react'
 export function Navbar() {
   const { data: session } = useSession()
   const [showReferModal, setShowReferModal] = useState(false)
+
+  const { data: friendsData } = useQuery<{ pendingReceived: unknown[] }>({
+    queryKey: ['friends'],
+    queryFn: async () => {
+      const res = await fetch('/api/friends')
+      if (!res.ok) throw new Error('Failed to fetch')
+      return res.json()
+    },
+    enabled: !!session,
+    refetchInterval: 30000,
+  })
+
+  const notificationCount = friendsData?.pendingReceived?.length ?? 0
 
   return (
     <nav className="bg-white border-b border-black/10 sticky top-0 z-50 shadow-sm">
@@ -47,9 +61,14 @@ export function Navbar() {
                 </Link>
                 <Link
                   href="/friends"
-                  className="text-black/70 hover:text-op-red transition-colors font-medium text-sm uppercase tracking-wider"
+                  className="relative inline-flex items-center text-black/70 hover:text-op-red transition-colors font-medium text-sm uppercase tracking-wider"
                 >
                   Friends
+                  {notificationCount > 0 && (
+                    <span className="absolute -top-2 -right-4 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-op-red text-[10px] font-bold text-white px-1 pointer-events-none">
+                      {notificationCount > 9 ? '9+' : notificationCount}
+                    </span>
+                  )}
                 </Link>
                 <Link
                   href="/portfolio"

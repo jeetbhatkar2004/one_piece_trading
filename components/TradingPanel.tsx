@@ -16,6 +16,11 @@ interface CharacterData {
   price: number
 }
 
+interface PortfolioResponse {
+  berriesBalance: string
+  positions: Position[]
+}
+
 interface Quote {
   amountOut: string
   fee: string
@@ -40,13 +45,14 @@ export function TradingPanel({ character }: { character: CharacterData }) {
   const queryClient = useQueryClient()
   const [side, setSide] = useState<'BUY' | 'SELL'>('BUY')
   const [amountIn, setAmountIn] = useState('')
+  const [inputMode, setInputMode] = useState<'berries' | 'tokens'>('berries') // For BUY: berries or tokens
   const [slippageBps, setSlippageBps] = useState(20) // 0.2%
   const [quote, setQuote] = useState<Quote | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showCloseConfirm, setShowCloseConfirm] = useState(false)
 
-  const { data: portfolio } = useQuery<{ positions: Position[] }>({
+  const { data: portfolio } = useQuery<PortfolioResponse>({
     queryKey: ['portfolio'],
     queryFn: async () => {
       const res = await fetch('/api/portfolio')
@@ -57,6 +63,7 @@ export function TradingPanel({ character }: { character: CharacterData }) {
   })
 
   const position = portfolio?.positions?.find((p) => p.characterSlug === character.slug)
+  const berriesBalance = portfolio?.berriesBalance ? parseFloat(portfolio.berriesBalance) : 0
 
   const closeMutation = useMutation({
     mutationFn: async (slug: string) => {
@@ -107,6 +114,7 @@ export function TradingPanel({ character }: { character: CharacterData }) {
             slug: character.slug,
             side,
             amountIn,
+            amountInType: side === 'BUY' ? inputMode : 'berries',
             slippageBps,
           }),
         })
@@ -129,7 +137,7 @@ export function TradingPanel({ character }: { character: CharacterData }) {
 
     const timeoutId = setTimeout(fetchQuote, 300) // Debounce
     return () => clearTimeout(timeoutId)
-  }, [character.slug, side, amountIn, slippageBps])
+  }, [character.slug, side, amountIn, inputMode, slippageBps])
 
   const handleTrade = async () => {
     if (!session) {
@@ -140,6 +148,11 @@ export function TradingPanel({ character }: { character: CharacterData }) {
     if (!quote || !amountIn) {
       return
     }
+
+    // For BUY with tokens mode, we need to send berries (from quote.berriesIn)
+    const amountToSend = side === 'BUY' && inputMode === 'tokens' && (quote as any).berriesIn
+      ? (quote as any).berriesIn
+      : amountIn
 
     setLoading(true)
     setError('')
@@ -152,7 +165,7 @@ export function TradingPanel({ character }: { character: CharacterData }) {
         body: JSON.stringify({
           slug: character.slug,
           side,
-          amountIn,
+          amountIn: amountToSend,
           slippageBps,
           clientNonce,
         }),
@@ -256,6 +269,7 @@ export function TradingPanel({ character }: { character: CharacterData }) {
             setSide('BUY')
             setAmountIn('')
             setQuote(null)
+            setInputMode('berries')
           }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -286,9 +300,41 @@ export function TradingPanel({ character }: { character: CharacterData }) {
       </div>
 
       <div className="space-y-4">
+        {session && side === 'BUY' && (
+          <div className="flex justify-between items-center text-xs font-mono text-black/60 mb-2">
+            <span>Available</span>
+            <span className="font-semibold text-black">₿{berriesBalance.toFixed(2)}</span>
+          </div>
+        )}
+        {side === 'BUY' && (
+          <div className="flex gap-2 mb-2">
+            <button
+              type="button"
+              onClick={() => { setInputMode('berries'); setAmountIn(''); setQuote(null) }}
+              className={`px-2 py-1 rounded text-xs font-mono uppercase ${
+                inputMode === 'berries' ? 'bg-black text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+              }`}
+            >
+              Berries
+            </button>
+            <button
+              type="button"
+              onClick={() => { setInputMode('tokens'); setAmountIn(''); setQuote(null) }}
+              className={`px-2 py-1 rounded text-xs font-mono uppercase ${
+                inputMode === 'tokens' ? 'bg-black text-white' : 'bg-black/10 text-black/70 hover:bg-black/20'
+              }`}
+            >
+              Tokens
+            </button>
+          </div>
+        )}
         <div>
           <label className="block text-xs text-black/60 font-mono uppercase tracking-wider mb-2">
-            {side === 'BUY' ? 'Berries In' : 'Tokens In'}
+            {side === 'BUY'
+              ? inputMode === 'berries'
+                ? 'Berries In'
+                : 'Tokens To Buy'
+              : 'Tokens In'}
           </label>
           <input
             type="number"
@@ -326,6 +372,14 @@ export function TradingPanel({ character }: { character: CharacterData }) {
               exit={{ opacity: 0, height: 0 }}
               className="bg-black/5 border-2 border-black/10 p-4 rounded space-y-3"
             >
+              {side === 'BUY' && inputMode === 'tokens' && (quote as any).berriesIn && (
+                <div className="flex justify-between">
+                  <span className="text-xs text-black/60 font-mono uppercase">Berries to Spend</span>
+                  <span className="text-sm font-mono text-black font-semibold">
+                    ₿{parseFloat((quote as any).berriesIn).toFixed(2)}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-xs text-black/60 font-mono uppercase">
                   {side === 'BUY' ? 'Tokens Out' : 'Berries Out'}

@@ -28,6 +28,19 @@ export async function GET() {
         )
 
         // Get price 24h ago from candles
+        const candles24h = await prisma.priceCandle.findMany({
+          where: {
+            characterId: char.id,
+            bucketStart: { gte: twentyFourHoursAgo },
+          },
+          select: { volumeBerries: true },
+        })
+
+        const volume24h = candles24h.reduce(
+          (sum, c) => sum.plus(new Decimal(c.volumeBerries)),
+          new Decimal(0)
+        )
+
         const candle24hAgo = await prisma.priceCandle.findFirst({
           where: {
             characterId: char.id,
@@ -46,7 +59,7 @@ export async function GET() {
           ? new Decimal(0)
           : currentPrice.minus(price24hAgo).div(price24hAgo).mul(100)
 
-        const liquidity = new Decimal(char.pool.reserveBerries).mul(2) // Total value locked
+        const liquidity = new Decimal(char.pool.reserveBerries).mul(2) // Total value locked (TVL)
 
         return {
           id: char.id,
@@ -55,6 +68,7 @@ export async function GET() {
           price: currentPrice.toNumber(),
           change24h: change24h.toNumber(),
           liquidity: liquidity.toNumber(),
+          volume24h: volume24h.toNumber(),
         }
       })
     )

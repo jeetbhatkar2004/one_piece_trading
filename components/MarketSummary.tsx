@@ -11,6 +11,7 @@ interface Character {
   price: number
   change24h: number
   liquidity: number
+  volume24h?: number
 }
 
 export function MarketSummary() {
@@ -28,13 +29,10 @@ export function MarketSummary() {
     return null
   }
 
-  // Calculate market metrics
-  const totalMarketCap = characters.reduce((sum, c) => sum + c.liquidity, 0)
-  const totalVolume24h = characters.reduce((sum, c) => {
-    // Estimate volume from liquidity and price changes
-    return sum + (c.liquidity * Math.abs(c.change24h) / 100)
-  }, 0)
-  
+  // Real market metrics from API
+  const totalLiquidity = characters.reduce((sum, c) => sum + c.liquidity, 0)
+  const totalVolume24h = characters.reduce((sum, c) => sum + (c.volume24h ?? 0), 0)
+
   const gainers = characters.filter((c) => c.change24h > 0).length
   const losers = characters.filter((c) => c.change24h < 0).length
   const unchanged = characters.length - gainers - losers
@@ -44,14 +42,14 @@ export function MarketSummary() {
 
   const stats = [
     {
-      label: 'Total Market Cap',
-      value: `₿${(totalMarketCap / 1000000).toFixed(2)}M`,
+      label: 'Total Liquidity',
+      value: `₿${totalLiquidity >= 1000000 ? (totalLiquidity / 1000000).toFixed(2) + 'M' : (totalLiquidity / 1000).toFixed(1) + 'K'}`,
       icon: DollarSign,
       color: 'text-black',
     },
     {
       label: '24h Volume',
-      value: `₿${(totalVolume24h / 1000).toFixed(1)}K`,
+      value: `₿${totalVolume24h >= 1000000 ? (totalVolume24h / 1000000).toFixed(2) + 'M' : totalVolume24h >= 1000 ? (totalVolume24h / 1000).toFixed(1) + 'K' : totalVolume24h.toFixed(2)}`,
       icon: Activity,
       color: 'text-black',
     },

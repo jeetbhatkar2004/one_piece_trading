@@ -11,6 +11,7 @@ interface Character {
   price: number
   change24h: number
   liquidity: number
+  volume24h: number
 }
 
 export function QuickStats() {
@@ -28,23 +29,21 @@ export function QuickStats() {
     return null
   }
 
-  const totalMarketCap = characters.reduce((sum, c) => sum + c.liquidity, 0)
-  const totalVolume24h = characters.reduce((sum, c) => {
-    return sum + (c.liquidity * Math.abs(c.change24h) / 100)
-  }, 0)
+  const totalLiquidity = characters.reduce((sum, c) => sum + c.liquidity, 0)
+  const totalVolume24h = characters.reduce((sum, c) => sum + (c.volume24h ?? 0), 0)
   const activeTokens = characters.length
   const avgChange = characters.reduce((sum, c) => sum + c.change24h, 0) / characters.length
 
   const stats = [
     {
-      label: 'Total Market Cap',
-      value: `₿${(totalMarketCap / 1000000).toFixed(2)}M`,
+      label: 'Total Liquidity',
+      value: `₿${totalLiquidity >= 1000000 ? (totalLiquidity / 1000000).toFixed(2) + 'M' : (totalLiquidity / 1000).toFixed(1) + 'K'}`,
       icon: DollarSign,
       color: 'text-op-red',
     },
     {
       label: '24h Volume',
-      value: `₿${(totalVolume24h / 1000).toFixed(1)}K`,
+      value: `₿${totalVolume24h >= 1000000 ? (totalVolume24h / 1000000).toFixed(2) + 'M' : totalVolume24h >= 1000 ? (totalVolume24h / 1000).toFixed(1) + 'K' : totalVolume24h.toFixed(2)}`,
       icon: Activity,
       color: 'text-op-yellow',
     },

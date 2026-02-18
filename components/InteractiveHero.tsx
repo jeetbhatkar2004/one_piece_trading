@@ -1,27 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { TrendingUp, TrendingDown, Activity, DollarSign } from 'lucide-react'
+import { TrendingUp, Activity, DollarSign } from 'lucide-react'
 
 export function InteractiveHero() {
-  const [stats, setStats] = useState({
-    totalVolume: 0,
-    activeTraders: 0,
-    priceChanges: 0,
+  const { data: stats = { totalVolume24h: '0', activeTraders: 0, trades24h: 0 } } = useQuery({
+    queryKey: ['hero-stats'],
+    queryFn: async () => {
+      const res = await fetch('/api/stats')
+      if (!res.ok) return { totalVolume24h: '0', activeTraders: 0, trades24h: 0 }
+      return res.json()
+    },
+    refetchInterval: 10000,
   })
 
-  // Simulate live stats
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStats({
-        totalVolume: Math.random() * 5000000 + 10000000,
-        activeTraders: Math.floor(Math.random() * 500 + 1000),
-        priceChanges: Math.floor(Math.random() * 50 + 100),
-      })
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [])
+  const totalVolume = parseFloat(stats.totalVolume24h || '0')
 
   return (
     <div className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
@@ -150,14 +144,13 @@ export function InteractiveHero() {
             <DollarSign className="w-4 h-4 text-black" />
             <div className="text-left">
               <div className="text-xs font-mono text-black/60 uppercase">24h Volume</div>
-              <motion.div
-                key={stats.totalVolume}
-                initial={{ scale: 1.2, opacity: 0.5 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="text-sm font-mono font-bold text-black"
-              >
-                ₿{(stats.totalVolume / 1000000).toFixed(2)}M
-              </motion.div>
+              <div className="text-sm font-mono font-bold text-black">
+                ₿{totalVolume >= 1000000
+                  ? (totalVolume / 1000000).toFixed(2) + 'M'
+                  : totalVolume >= 1000
+                    ? (totalVolume / 1000).toFixed(1) + 'K'
+                    : totalVolume.toFixed(2)}
+              </div>
             </div>
           </motion.div>
 
@@ -170,19 +163,14 @@ export function InteractiveHero() {
           >
             <Activity className="w-4 h-4 text-black" />
             <div className="text-left">
-              <div className="text-xs font-mono text-black/60 uppercase">Active Traders</div>
-              <motion.div
-                key={stats.activeTraders}
-                initial={{ scale: 1.2, opacity: 0.5 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="text-sm font-mono font-bold text-black"
-              >
-                {stats.activeTraders.toLocaleString()}
-              </motion.div>
+              <div className="text-xs font-mono text-black/60 uppercase">Active Traders (24h)</div>
+              <div className="text-sm font-mono font-bold text-black">
+                {stats.activeTraders?.toLocaleString() ?? 0}
+              </div>
             </div>
           </motion.div>
 
-          {/* Price Updates */}
+          {/* Trades 24h */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -191,15 +179,10 @@ export function InteractiveHero() {
           >
             <TrendingUp className="w-4 h-4 text-green-600" />
             <div className="text-left">
-              <div className="text-xs font-mono text-black/60 uppercase">Price Updates</div>
-              <motion.div
-                key={stats.priceChanges}
-                initial={{ scale: 1.2, opacity: 0.5 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="text-sm font-mono font-bold text-black"
-              >
-                {stats.priceChanges}/sec
-              </motion.div>
+              <div className="text-xs font-mono text-black/60 uppercase">Trades (24h)</div>
+              <div className="text-sm font-mono font-bold text-black">
+                {(stats.trades24h ?? 0).toLocaleString()}
+              </div>
             </div>
           </motion.div>
 

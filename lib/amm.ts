@@ -29,6 +29,39 @@ export function getSpotPrice(reserveBerries: Decimal, reserveTokens: Decimal): D
 }
 
 /**
+ * Quote for buying tokens - when user specifies desired tokens out, compute berries in
+ * Solves: tokensOut = Rt - k/(Rb + B_eff) for B
+ */
+export function quoteBuyForTokensOut(
+  reserveBerries: Decimal,
+  reserveTokens: Decimal,
+  tokensOut: Decimal,
+  feeBps: number
+): QuoteResult & { berriesIn: Decimal } {
+  if (tokensOut.lte(0) || tokensOut.gte(reserveTokens)) {
+    throw new Error('Invalid tokens out')
+  }
+  const feeDecimal = new Decimal(feeBps).div(10000)
+  const k = reserveBerries.mul(reserveTokens)
+  const newReserveTokens = reserveTokens.minus(tokensOut)
+  const newReserveBerries = k.div(newReserveTokens)
+  const berriesEffective = newReserveBerries.minus(reserveBerries)
+  const berriesIn = berriesEffective.div(new Decimal(1).minus(feeDecimal))
+  const fee = berriesIn.mul(feeDecimal)
+  const priceBefore = getSpotPrice(reserveBerries, reserveTokens)
+  const priceAfter = getSpotPrice(newReserveBerries, newReserveTokens)
+  return {
+    amountOut: tokensOut,
+    fee,
+    priceBefore,
+    priceAfter,
+    newReserveBerries,
+    newReserveTokens,
+    berriesIn,
+  }
+}
+
+/**
  * Quote for buying tokens with berries
  * User inputs ΔB (berries in)
  */
