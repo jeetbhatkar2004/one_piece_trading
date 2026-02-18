@@ -205,7 +205,14 @@ const slugToImageMap: Record<string, string> = {
 
 export function getCharacterImagePath(slug: string): string {
   const s = slug.toLowerCase();
-  const base = '/regenerated_avatars';
+  const base = '/images/characters';
   if (slugToImageMap[s]) return base + '/' + slugToImageMap[s];
   return base + '/' + s + '.png';
+}
+
+/** Resolves slug to filename for API (no fs). Returns null if not in map. */
+export function getCharacterImageFilename(slug: string): string | null {
+  const s = slug.toLowerCase();
+  if (slugToImageMap[s]) return slugToImageMap[s];
+  return null;
 }

@@ -34,3 +34,13 @@ yarn-error.log*
 next-env.d.ts
 
 # prisma (migrations are committed for deploy)
+
+# Source image folders (canonical images are in public/images/characters)
+/regenerated_avatars
+/onepiece_character_ai
+/one_piece_real_imagesforgeneration
+
+# Temp generated images
+ChatGPT Image*.png
+ChatGPT Image*.jpg
+*-Picsart-BackgroundRemover.png

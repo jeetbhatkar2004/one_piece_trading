@@ -9,6 +9,12 @@ const nextConfig = {
       },
     ],
   },
+  // Exclude large static assets from serverless function tracing (fixes 250MB limit)
+  experimental: {
+    outputFileTracingExcludes: {
+      '/api/character-image/[slug]': ['public/images/characters/**'],
+    },
+  },
 }
 
 module.exports = nextConfig

@@ -1,60 +1,18 @@
 # Character Images Setup
 
-## Issues Fixed
+All character avatars are served from `public/images/characters/` as PNG files.
 
-1. **Image API Route** - Updated to:
-   - Check for direct image files first (webp, jpg, png)
-   - Extract base64 images from HTML files with improved regex
-   - Handle slug variations (boa-hancock → boahancock, usopp → ussop)
-
-2. **Character Avatar Component** - Fetches images from API and handles:
-   - Direct image files
-   - Base64 data URLs from HTML files
-   - Loading states
-   - Fallback gradients
-
-## To Fix Remaining Issues
-
-### 1. Re-seed Database (to get all characters)
-Run this command to add all new characters:
-```bash
-npm run db:seed
+## Structure
+```
+public/images/
+  characters/     # PNG avatars (one per character, ~1.7MB each)
+  one_piece_map_outline.png   # Background map (MangaBackground)
 ```
 
-This will add the new characters:
-- Fujitora
-- Gaban
-- Imu
-- Loki
-- Rocks D. Xebec
-- Gol D. Roger
-- Shamrock
+## Adding New Character Images
+1. Add the PNG to `public/images/characters/` (use character slug as filename, e.g. `luffy.png`)
+2. For slugs with hyphens (e.g. `big-mom`), add a mapping in `lib/character-image-paths.ts`
+3. Restart dev server - the API will serve the new image
 
-### 2. Verify Images Are Working
-The image API should now:
-- Serve zoro.jpg, chopper.webp, sanji.webp directly
-- Extract base64 images from HTML files for other characters
-- Show fallback gradients for characters without images
-
-### 3. Chart Images
-The chart legend uses CharacterAvatar component which should now work. If images still don't show:
-- Check browser console for API errors
-- Verify the API route is working: `/api/character-image/[slug]`
-- Make sure HTML files are in `public/images/characters/`
-
-## File Structure
-```
-public/images/characters/
-  - zoro.jpg
-  - chopper.webp
-  - sanji.webp
-  - *.htm (27 HTML files with base64 images)
-```
-
-## Testing
-Test the image API:
-```bash
-curl http://localhost:3000/api/character-image/brook
-curl http://localhost:3000/api/character-image/zoro
-curl http://localhost:3000/api/character-image/chopper
-```
+## API
+The `/api/character-image/[slug]` route resolves slugs to image paths. It uses the static map in `lib/character-image-paths.ts` (no filesystem access in production).
