@@ -5,6 +5,17 @@ import { generateOTP, sendOTPEmail } from '@/lib/otp'
 
 export async function POST(req: NextRequest) {
   try {
+    // Fail fast if no email service configured
+    const hasGmail = process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD
+    const hasResend = !!process.env.RESEND_API_KEY
+    if (!hasGmail && !hasResend) {
+      console.error('[request-otp] No email service: set GMAIL_USER+GMAIL_APP_PASSWORD or RESEND_API_KEY')
+      return NextResponse.json(
+        { error: 'Failed to send OTP. Please contact support.' },
+        { status: 500 }
+      )
+    }
+
     const body = await req.json()
     const { email } = requestOTPSchema.parse(body)
 
@@ -37,7 +48,9 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    console.error('OTP request error:', error)
+    // Log full error for debugging in Vercel logs
+    console.error('[request-otp] Error:', error?.message ?? error)
+    if (error?.cause) console.error('[request-otp] Cause:', error.cause)
     return NextResponse.json(
       { error: 'Failed to send OTP' },
       { status: 500 }
