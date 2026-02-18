@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { getCharacterGradientColor } from '@/lib/character-descriptions'
 
 interface CharacterAvatarProps {
@@ -121,8 +122,7 @@ export function CharacterAvatar({
           className="rounded-full bg-black overflow-hidden shrink-0 group"
           style={{ width: innerSize, height: innerSize }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={imageSrc!}
             alt={displayName}
             width={innerSize}

@@ -101,7 +101,7 @@ export default function LoginPage() {
               </motion.button>
             </form>
             <p className="mt-6 text-center text-sm text-black/60 font-mono">
-              Don&apos;t have an account?{' '}
+              {`Don't have an account?`}{' '}
               <Link href="/register" className="text-op-red hover:text-op-orange font-semibold">
                 Register
               </Link>

@@ -144,7 +144,7 @@ export default function RegisterPage() {
                       placeholder="your@email.com"
                     />
                     <p className="mt-1 text-xs text-black/40 font-mono">
-                      We&apos;ll send you a verification code
+                      {`We'll send you a verification code`}
                     </p>
                   </div>
                   <motion.button
@@ -266,7 +266,7 @@ export default function RegisterPage() {
             </AnimatePresence>
 
             <p className="mt-6 text-center text-sm text-black/60 font-mono">
-              Already have an account?{' '}
+              {`Already have an account?`}{' '}
               <Link href="/login" className="text-op-red hover:text-op-orange font-semibold">
                 Login
               </Link>
