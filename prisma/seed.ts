@@ -49,7 +49,7 @@ async function main() {
     await prisma.pool.upsert({
       where: { characterId: character.id },
       update: {
-        feeBps: 20,
+        feeBps: 100,
         reserveBerries: baseReserve,
         reserveTokens: startingTokens,
       },
@@ -57,7 +57,7 @@ async function main() {
         characterId: character.id,
         reserveBerries: baseReserve,
         reserveTokens: startingTokens,
-        feeBps: 20, // 0.2% fee
+        feeBps: 100, // 1% fee
       },
     })
 

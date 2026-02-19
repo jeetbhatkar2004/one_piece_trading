@@ -26,6 +26,7 @@ export function MarketSearch({ onSearch, placeholder = 'Search tokens by name...
   const [query, setQuery] = useState('')
   const [showAutocomplete, setShowAutocomplete] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const { data: characters } = useQuery<Character[]>({
     queryKey: ['characters'],
@@ -60,6 +61,19 @@ export function MarketSearch({ onSearch, placeholder = 'Search tokens by name...
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Cmd+F / Ctrl+F to focus search (override browser find)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+        e.preventDefault()
+        inputRef.current?.focus()
+        inputRef.current?.select()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setQuery(value)
@@ -89,6 +103,7 @@ export function MarketSearch({ onSearch, placeholder = 'Search tokens by name...
       <div className="relative">
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black/40" />
         <input
+          ref={inputRef}
           type="text"
           value={query}
           onChange={handleChange}

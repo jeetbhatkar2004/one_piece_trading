@@ -122,7 +122,7 @@ model Pool {
   character     Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
   reserveBerries Decimal  @map("reserve_berries")
   reserveTokens  Decimal  @map("reserve_tokens")
-  feeBps        Int       @default(20) @map("fee_bps")
+  feeBps        Int       @default(100) @map("fee_bps")
   version       Int       @default(0)
   updatedAt     DateTime  @updatedAt @map("updated_at")
   
